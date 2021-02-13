@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import { POPULAR_BASE_URL } from "../../config";
 
-export const useHomeFetch = () => {
-  const [state, setState] = useState({ movies: [] });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+export const useHomeFetch = searchTerm => {
+	const [state, setState] = useState({ movies: [] });
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(false);
 
-  const fetchMovies = async endpoint => {
-    setError(false);
+	const fetchMovies = async endpoint => {
+		setError(false);
 
-    setLoading(true);
+		setLoading(true);
 
-    /*
+		/*
     - this checks if "page" exists in an endpoint
 
     - if it does, then movies are being loaded
@@ -22,16 +22,16 @@ export const useHomeFetch = () => {
     - However between the 2 pages, there's a distinct difference in 
       the nature of loading movies when the Load More button is clicked
     */
-    const moviesBeingLoaded = endpoint.search("page");
+		const moviesBeingLoaded = endpoint.search("page");
 
-    try {
-      const data = await (await fetch(endpoint)).json();
+		try {
+			const data = await (await fetch(endpoint)).json();
 
-      // use a update callback in setState()
-      setState(previousState => ({
-        ...previousState,
+			// use a update callback in setState()
+			setState(previousState => ({
+				...previousState,
 
-        /*
+				/*
         - The search() method searches a string for a specified value
 
         - The search value can be string or a regular expression ("page" in this case)
@@ -51,31 +51,47 @@ export const useHomeFetch = () => {
           search term in the search movie input field are loaded/show up on the page 
           -> [...data.results]
         */
-        movies:
-          moviesBeingLoaded !== -1
-            ? [...previousState.movies, ...data.results]
-            : [...data.results],
+				movies:
+					moviesBeingLoaded !== -1 ? [...previousState.movies, ...data.results] : [...data.results],
 
-        heroImage: previousState.heroImage || data.results[0],
+				heroImage: previousState.heroImage || data.results[0],
 
-        currentPage: data.page,
+				currentPage: data.page,
 
-        totalPages: data.total_pages
-      }));
-    } catch (error) {
-      setError(true);
+				totalPages: data.total_pages
+			}));
+		} catch (error) {
+			setError(true);
 
-      console.log(error);
-    }
+			console.log(error);
+		}
 
-    setLoading(false);
-  };
+		setLoading(false);
+	};
 
-  useEffect(() => {
-    const getPopularMovies = async () => await fetchMovies(POPULAR_BASE_URL);
+	useEffect(() => {
+		if (sessionStorage.homeState) {
+			console.log("\nfetching data from session storage | useHomeFetch\n\n");
 
-    getPopularMovies();
-  }, []);
+			setState(JSON.parse(sessionStorage.homeState)); // JSON stirng -> JS object
 
-  return [{ state, loading, error }, fetchMovies];
+			setLoading(false);
+		} else {
+			console.log("\nfetching data from the API | useHomeFetch\n\n");
+
+			const getPopularMovies = async () => await fetchMovies(POPULAR_BASE_URL);
+
+			getPopularMovies();
+		}
+	}, []);
+
+	useEffect(() => {
+		// if there's a search term, persisting the state while searching for movies is futile
+		if (!searchTerm) {
+			// writing to sessionStorage (data -> JSON string)
+			sessionStorage.setItem("homeState", JSON.stringify(state));
+		}
+	}, [searchTerm, state]);
+
+	return [{ state, loading, error }, fetchMovies];
 };

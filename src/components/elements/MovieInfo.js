@@ -1,8 +1,9 @@
-import React from "react";
-import MovieThumb from "./MovieThumb";
-import { StyledMovieInfo } from "../styles/StyledMovieInfo";
-import { IMAGE_BASE_URL, POSTER_SIZE } from "../../config";
-import NoImage from "../images/no_image.jpg";
+import React from "react"
+import PropTypes from "prop-types"
+import MovieThumb from "./MovieThumb"
+import { StyledMovieInfo } from "../styles/StyledMovieInfo"
+import { IMAGE_BASE_URL, POSTER_SIZE } from "../../config"
+import NoImage from "../images/no_image.jpg"
 
 const MovieInfo = ({ movieInfo }) => {
   return (
@@ -39,7 +40,9 @@ const MovieInfo = ({ movieInfo }) => {
         </div>
       </div>
     </StyledMovieInfo>
-  );
-};
+  )
+}
 
-export default MovieInfo;
+MovieInfo.propTypes = { movieInfo: PropTypes.object }
+
+export default MovieInfo

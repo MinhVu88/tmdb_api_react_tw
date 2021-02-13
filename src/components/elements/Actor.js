@@ -1,7 +1,8 @@
-import React from "react";
-import { StyledActor } from "../styles/StyledActor";
-import { IMAGE_BASE_URL, POSTER_SIZE } from "../../config";
-import NoImage from "../images/no_image.jpg";
+import React from "react"
+import PropTypes from "prop-types"
+import { StyledActor } from "../styles/StyledActor"
+import { IMAGE_BASE_URL, POSTER_SIZE } from "../../config"
+import NoImage from "../images/no_image.jpg"
 
 const Actor = ({ actor }) => {
   return (
@@ -17,7 +18,9 @@ const Actor = ({ actor }) => {
       <span className="actor-name">{actor.name}</span>
       <span className="actor-character">{actor.character}</span>
     </StyledActor>
-  );
-};
+  )
+}
 
-export default Actor;
+Actor.propTypes = { actor: PropTypes.object }
+
+export default Actor
